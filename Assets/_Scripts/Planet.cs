@@ -14,7 +14,7 @@ public class Planet : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            ShipManager.Instance.payload.changeTargetLoc(this.gameObject);
+            ShipManager.Instance.setTargetPlanet(this.gameObject, false);
         }
     }
     void Update ()

@@ -11,20 +11,34 @@ public class ShipPayload : Ship
     private Vector3 TargetDir;
     private Planet TargetPlanet;
     private float TargetValue;
+    private bool HomeDest;
 
-    private GameObject curObject = null;
 
     private float HomeBaseDistTolerance = 0.5f;
-    private bool isMovingTowardsHomeBase = false;
+
+    public void setPPL(int ppl)
+    {
+        NumPeople = ppl;
+        Debug.Log(ppl);
+    }
 
     void Start()
     {
         TargetValue = 0;
-        TargetLoc = new Vector3(0, 0, 0);
-
+        TargetLoc = new Vector3(100, 100, 100);
+        TargetDir = new Vector3(0, 0, 0);
+        HomeDest = false;
     }
 
-    public override void Update()
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.SelectPayload(this.gameObject);
+        }
+    }
+
+    private void Update()
     {
         UpdateAliveText();
 
@@ -32,9 +46,11 @@ public class ShipPayload : Ship
 
         float curGravValue = GetGravityValue();
 
-        deathRate = curGravValue * 0.0005f;
+        deathRate = curGravValue * 0.0002f;
 
-        deathCounter += deathRate;
+
+        if(!ShipManager.Instance.getPause())
+            deathCounter += deathRate;
 
         // If death counter reaches limit, kill someone
         if (deathCounter > 1.0f)
@@ -48,21 +64,16 @@ public class ShipPayload : Ship
             Destroy(this.gameObject);
         }
 
+        if(!ShipManager.Instance.getPause() && Vector3.Distance(TargetLoc, this.transform.position) > TargetValue)
+        {
 
-        if(isMovingTowardsHomeBase)
-        {
-            if(Vector3.Distance(TargetLoc, this.transform.position) <= HomeBaseDistTolerance)
-            {
-                UnloadPayload();
-                Destroy(this.gameObject);
-            }
+            this.transform.position += 10 * TargetDir / GetGravityValue();
+            
         }
-        else
+        else if(HomeDest)
         {
-            if (Vector3.Distance(TargetLoc, this.transform.position) > TargetValue)
-            {
-                this.transform.position += 10 * TargetDir / GetGravityValue();
-            }
+            UnloadPayload();
+           this.gameObject.SetActive(false);
         }
     }
 
@@ -82,7 +93,6 @@ public class ShipPayload : Ship
     private void UnloadPayload()
     {
         Debug.Log("Unloading");
-        ShipManager.Instance.collectedObjs[curObject.GetInstanceID()] = true;
         ShipManager.Instance.Home.NumPeople += this.NumPeople;
     }
 
@@ -92,26 +102,26 @@ public class ShipPayload : Ship
         deathCounter = 0;
         Debug.Log("Someone died");
 	}
+
     
-    public void changeTargetLoc(GameObject obj)
+    public void changeTargetLoc(GameObject obj, bool state)
     {
-        if (obj.GetInstanceID() == ShipManager.Instance.Home.GetInstanceID())
-            isMovingTowardsHomeBase = true;
-        else
-            isMovingTowardsHomeBase = false;
-
-        curObject = obj;
-
         TargetLoc = obj.transform.position;
         TargetDir = TargetLoc - this.transform.position;
         TargetDir = TargetDir / TargetDir.magnitude;
 
-        if(!isMovingTowardsHomeBase)
+        TargetPlanet = obj.GetComponent<Planet>();
+        if(TargetPlanet != null)
         {
-            TargetPlanet = obj.GetComponent<Planet>();
             TargetValue = TargetPlanet.GravityValue / 2;
         }
+        else
+        {
+            TargetValue = 1.0f;
+        }
+        
 
+        HomeDest = state;
     }
     public float GetGravityValue()
     {

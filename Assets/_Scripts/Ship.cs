@@ -10,19 +10,31 @@ public class Ship : MonoBehaviour
     float birthRate;
     float birthCounter = 0;
 
-
     public TextMesh PeopleAliveText;
 
-	void Start ()
+    void Start ()
     {
 	}
 
-	public virtual void Update ()
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.setTargetPlanet(this.gameObject, true);
+        }
+    }
+
+    public void takePeople(int pop)
+    {
+        NumPeople -= pop;
+    }
+	void Update ()
     {
         UpdateAliveText();
 
         birthRate = GetBirthRate();
-        birthCounter += birthRate;
+        if(!ShipManager.Instance.getPause())
+            birthCounter += birthRate;
 
         if(birthCounter > 1.0f)
         {
@@ -30,14 +42,6 @@ public class Ship : MonoBehaviour
         }
 
 	}
-
-    private void OnMouseOver()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            ShipManager.Instance.payload.changeTargetLoc(this.gameObject);
-        }
-    }
 
     /// <summary>
     /// Get birth rate relative to the amount of people alive
