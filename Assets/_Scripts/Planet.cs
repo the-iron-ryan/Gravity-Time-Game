@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Planet : MonoBehaviour
 {
-    public float Mass;
+    public float GravityValue = 1.0f;
 
 	void Start () {
 		
 	}
 	
-	void Update () {
+	void Update ()
+    {
 		
 	}
 }
