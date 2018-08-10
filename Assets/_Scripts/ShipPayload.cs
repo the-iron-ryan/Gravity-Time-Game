@@ -9,32 +9,61 @@ public class ShipPayload : Ship
     private Vector3 TargetDir;
     private Planet TargetPlanet;
     private float TargetValue;
+    private bool HomeDest;
 
 
+    public void setPPL(int ppl)
+    {
+        NumPeople = ppl;
+        Debug.Log(ppl);
+    }
 
 	void Start ()
     {
         TargetValue = 0;
-        TargetLoc = new Vector3(0, 0, 0);
+        TargetLoc = new Vector3(100,100,100);
+        TargetDir = new Vector3(0, 0, 0);
+        HomeDest = false;
 	}
-	
-	void Update ()
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.SelectPayload(this.gameObject);
+        }
+    }
+
+    void Update ()
     {
 
-        if(Vector3.Distance(TargetLoc, this.transform.position) > TargetValue)
+        if(!ShipManager.Instance.getPause() && Vector3.Distance(TargetLoc, this.transform.position) > TargetValue)
         {
-            this.transform.position += 10 * TargetDir / GetGravityValue();
 
+            this.transform.position += 10 * TargetDir / GetGravityValue();
+            
+        }
+        else if(HomeDest)
+        {
+           this.gameObject.SetActive(false);
+
+            
         }
 	}
+
     
-    public void changeTargetLoc(GameObject obj)
+    public void changeTargetLoc(GameObject obj, bool state)
     {
         TargetLoc = obj.transform.position;
         TargetDir = TargetLoc - this.transform.position;
         TargetDir = TargetDir / TargetDir.magnitude;
         TargetPlanet = obj.GetComponent<Planet>();
-        TargetValue = TargetPlanet.GravityValue/2;
+        if(TargetPlanet != null)
+        {
+            TargetValue = TargetPlanet.GravityValue / 2;
+        }
+        
+
+        HomeDest = state;
 
     }
     public float GetGravityValue()

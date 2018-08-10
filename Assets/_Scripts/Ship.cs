@@ -6,12 +6,23 @@ public class Ship : MonoBehaviour
 {
     public int NumPeople;
 
-	void Start ()
+    void Start ()
     {
 		
 	}
-	
-	void Update ()
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.setTargetPlanet(this.gameObject, true);
+        }
+    }
+
+    public void takePeople(int pop)
+    {
+        NumPeople -= pop;
+    }
+    void Update ()
     {
 
 	}
