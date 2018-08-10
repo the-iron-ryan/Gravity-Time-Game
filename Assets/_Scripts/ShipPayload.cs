@@ -4,18 +4,61 @@ using UnityEngine;
 
 public class ShipPayload : Ship
 {
+    float deathRate;
+    float deathCounter = 0;
 
 
-	void Start ()
+    void Start()
     {
-		
-	}
-	
-	void Update ()
+
+
+    }
+
+    public override void Update()
     {
-        Debug.Log("Gravity Val: " + GetGravityValue());
-	}
-    
+        UpdateAliveText();
+
+        ControlWithArrowKeys();
+
+        float curGravValue = GetGravityValue();
+
+        deathRate = curGravValue * 0.0005f;
+
+        deathCounter += deathRate;
+
+        // If death counter reaches limit, kill someone
+        if (deathCounter > 1.0f)
+        {
+            KillSomeone();
+        }
+
+        // If all the people die, then destroy the object
+        if (NumPeople <= 0)
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Used to control the ship with arrow keys. Debug purposes only
+    /// </summary>
+    /// <returns></returns>
+    private void ControlWithArrowKeys()
+    {
+        // TODO: change speed to be relative to gravity
+        float speed = GetGravityValue() * 0.5f;
+
+        Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        transform.position += move * speed * Time.deltaTime;
+    }
+
+    public void KillSomeone()
+    {
+        NumPeople--;
+        deathCounter = 0;
+        Debug.Log("Someone died");
+    }
+
     public float GetGravityValue()
     {
         // Current position of the ship
