@@ -30,7 +30,14 @@ public class Ship : MonoBehaviour
         }
 
 	}
-    
+
+    private void OnMouseOver()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.payload.changeTargetLoc(this.gameObject);
+        }
+    }
 
     /// <summary>
     /// Get birth rate relative to the amount of people alive

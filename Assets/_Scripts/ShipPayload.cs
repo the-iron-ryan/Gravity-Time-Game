@@ -7,10 +7,20 @@ public class ShipPayload : Ship
     float deathRate;
     float deathCounter = 0;
 
+    private Vector3 TargetLoc;
+    private Vector3 TargetDir;
+    private Planet TargetPlanet;
+    private float TargetValue;
+
+    private GameObject curObject = null;
+
+    private float HomeBaseDistTolerance = 0.5f;
+    private bool isMovingTowardsHomeBase = false;
 
     void Start()
     {
-
+        TargetValue = 0;
+        TargetLoc = new Vector3(0, 0, 0);
 
     }
 
@@ -37,6 +47,23 @@ public class ShipPayload : Ship
         {
             Destroy(this.gameObject);
         }
+
+
+        if(isMovingTowardsHomeBase)
+        {
+            if(Vector3.Distance(TargetLoc, this.transform.position) <= HomeBaseDistTolerance)
+            {
+                UnloadPayload();
+                Destroy(this.gameObject);
+            }
+        }
+        else
+        {
+            if (Vector3.Distance(TargetLoc, this.transform.position) > TargetValue)
+            {
+                this.transform.position += 10 * TargetDir / GetGravityValue();
+            }
+        }
     }
 
     /// <summary>
@@ -52,19 +79,47 @@ public class ShipPayload : Ship
         transform.position += move * speed * Time.deltaTime;
     }
 
-    public void KillSomeone()
+    private void UnloadPayload()
     {
+        Debug.Log("Unloading");
+        ShipManager.Instance.collectedObjs[curObject.GetInstanceID()] = true;
+        ShipManager.Instance.Home.NumPeople += this.NumPeople;
+    }
+
+    private void KillSomeone()
+    { 
         NumPeople--;
         deathCounter = 0;
         Debug.Log("Someone died");
-    }
+	}
+    
+    public void changeTargetLoc(GameObject obj)
+    {
+        if (obj.GetInstanceID() == ShipManager.Instance.Home.GetInstanceID())
+            isMovingTowardsHomeBase = true;
+        else
+            isMovingTowardsHomeBase = false;
 
+        curObject = obj;
+
+        TargetLoc = obj.transform.position;
+        TargetDir = TargetLoc - this.transform.position;
+        TargetDir = TargetDir / TargetDir.magnitude;
+
+        if(!isMovingTowardsHomeBase)
+        {
+            TargetPlanet = obj.GetComponent<Planet>();
+            TargetValue = TargetPlanet.GravityValue / 2;
+        }
+
+    }
     public float GetGravityValue()
     {
         // Current position of the ship
         Vector3 pos = this.transform.position;
         float x = pos.x;
         float z = pos.z;
+
 
         // Coordinates of planets
         float x1 = ShipManager.Instance.planet11.transform.position.x;
