@@ -10,9 +10,16 @@ public class Planet : MonoBehaviour
 	void Start () {
 		
 	}
-	
-	void Update ()
+    private void OnMouseOver()
     {
+        if (Input.GetMouseButtonDown(0))
+        {
+            ShipManager.Instance.payload.changeTargetLoc(this.gameObject);
+        }
+    }
+    void Update ()
+    {
+        
         this.transform.localScale = Vector3.one * GravityValue;
 	}
 }

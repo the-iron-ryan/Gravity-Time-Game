@@ -8,6 +8,8 @@ public class ShipManager : Singleton<ShipManager>
     public Planet planet12;
     public Planet planet21;
     public Planet planet22;
+    public Ship Home;
+    public ShipPayload payload;
     
 
     void Start ()
