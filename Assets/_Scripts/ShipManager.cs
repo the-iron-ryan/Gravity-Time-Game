@@ -8,6 +8,7 @@ public class ShipManager : Singleton<ShipManager>
     public Planet planet12;
     public Planet planet21;
     public Planet planet22;
+    
 
     void Start ()
     {
@@ -16,6 +17,7 @@ public class ShipManager : Singleton<ShipManager>
 	
 	// Update is called once per frame
 	void Update () {
+        
 		
 	}
 }
